@@ -79,3 +79,4 @@ def plot_tp_scat(spotter_id, tpobs, tpmod):
     plt.savefig(spotter_id+'_tp_scat.png')
     #plt.show()
     plt.close()
+    
