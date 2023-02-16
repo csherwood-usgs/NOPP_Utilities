@@ -16,6 +16,7 @@ def plot_hs_ts(spotter_id, dt, hobs, hmod, show=True):
     plt.text(x=.95, y=.05, s=ts, fontsize=10, c='tab:blue',transform=ax.transAxes,\
                                  horizontalalignment='right', verticalalignment='bottom')
     plt.legend(loc='upper left')
+    plt.title(spotter_id)
     ax.tick_params(axis='x', rotation=45)
     plt.savefig(spotter_id+'_hs_ts.png', bbox_inches='tight')
     if(show):
@@ -59,6 +60,7 @@ def plot_tp_ts(spotter_id, dt, tpobs, tpmod, show=True):
     plt.text(x=.95, y=.05, s=ts, fontsize=10, c='tab:blue',transform=ax.transAxes,\
                                  horizontalalignment='right', verticalalignment='bottom')
     plt.legend(loc='upper left')
+    plt.ylim([2, 16])
     ax.tick_params(axis='x', rotation=45)
     plt.savefig(spotter_id+'_tp_ts.png', bbox_inches='tight')
     if(show):
@@ -93,6 +95,7 @@ def plot_tp_scat(spotter_id, tpobs, tpmod, show=True):
 # dir time series plot
 def plot_dir_ts(spotter_id, dt, mdirobs, mdirsobs, mdirmod, mdirsmod, show=True):
     rmse = np.sqrt( np.mean( (mdirobs - mdirmod)**2) )
+    #axis = [-20,380,-20,380]
     ts = 'RMSE: {:.2f} $^\circ$'.format(rmse)
     fig, ax = plt.subplots(ncols=1)
     plt.errorbar(dt,mdirobs,yerr=mdirsobs,linewidth = 3,capsize=2, label='Measured')
@@ -102,8 +105,10 @@ def plot_dir_ts(spotter_id, dt, mdirobs, mdirsobs, mdirmod, mdirsmod, show=True)
     plt.text(x=.95, y=.05, s=ts, fontsize=10, c='tab:blue',transform=ax.transAxes,\
             horizontalalignment='right', verticalalignment='bottom')
     plt.legend(loc='upper left')
+    plt.title(spotter_id)
     ax.tick_params(axis='x', rotation=45)
-    plt.savefig(spotter_id+'_tp_ts.png', bbox_inches='tight')
+    plt.ylim([-20, 380])
+    plt.savefig(spotter_id+'_dir_ts.png', bbox_inches='tight')
     if(show):
         plt.show()
     plt.close()
