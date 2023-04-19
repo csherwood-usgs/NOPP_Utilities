@@ -2,7 +2,7 @@ name: NOPP
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
+  - python=3.10
   - bagit
   - bokeh
   - cartopy >=0.11
@@ -41,7 +41,7 @@ dependencies:
   - nc-time-axis
   - nco
   - netcdf4 #xroms
-  - numba >= 0.49 #xroms
+  - numba 
   - numpy
   - oceans
   - oct2py
