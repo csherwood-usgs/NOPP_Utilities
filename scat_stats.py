@@ -1,5 +1,5 @@
 # statistics for scatter plots
-import numpy as np
+import numpy as npg
 
 # Collection of statistics used to evaluate agreement between
 # two sets of points (e.g. scatterplots).
