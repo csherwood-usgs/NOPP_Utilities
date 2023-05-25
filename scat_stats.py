@@ -1,9 +1,9 @@
 # statistics for scatter plots
-import numpy as npg
+import numpy as np
 
 # Collection of statistics used to evaluate agreement between
 # two sets of points (e.g. scatterplots).
-# No attempt to optimize these has been performed.
+# No attempt to optimize or vectorize these has been performed.
 
 # Might want to pass flattened arrays to these
 
