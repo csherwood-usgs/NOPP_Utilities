@@ -52,6 +52,30 @@ def to_moment( R1,R2, alpha1,alpha2 ):
 
     return a1, b1, a2, b2
 
+def to_Fourier( Efth, frequencies, direction_radians, directional_bin_width_deg, faxis=0, daxis=1 ):
+    """
+    Convert 2d spectrum to Fourier coefficients
+    Based on code from Isabel Houghton, Sofar
+    """
+    Ef = integrate_in_direction(Efth, directional_bin_width_deg, daxis=daxis)
+
+    # each directional coefficient (a1, b1..) is a Fourier coefficient of the 2D WW3 spectrum,
+    # normalized by the 1D (directionally-integrated) energy density spectrum
+    a1 = integrate_in_direction(Efth * np.cos(direction_radians),
+                                directional_bin_width=directional_bin_width_deg, daxis=daxis) / Ef
+
+    a2 = integrate_in_direction(Efth * np.cos(2 * direction_radians),
+                                directional_bin_width=directional_bin_width_deg, daxis=daxis) / Ef
+
+    b1 = integrate_in_direction(Efth * np.sin(direction_radians),
+                                directional_bin_width=directional_bin_width_deg, daxis=daxis) / Ef
+
+    b2 = integrate_in_direction(Efth * np.sin(2 * direction_radians),
+                                directional_bin_width=directional_bin_width_deg, daxis=daxis) / Ef
+    
+    return Ef, a1, a2, b1, b2
+
+
 
 def calc_spec1d_2d( spec2d, directional_bin_width, daxis=1 ):
     # integrate over direction to get 1d spec from 2d spec
