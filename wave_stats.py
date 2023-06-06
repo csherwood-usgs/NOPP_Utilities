@@ -140,8 +140,9 @@ def calc_sigma_theta_a1b1( a1, b1, spec1d, frequencies ):
     a1bar = np.trapz(a1 * spec1d, frequencies) / np.trapz( spec1d, frequencies )
     b1bar = np.trapz(b1 * spec1d,  frequencies) / np.trapz( spec1d, frequencies )
     s1 = (180./np.pi)*np.sqrt( 2. * ( 1.-np.sqrt( a1bar**2 + b1bar**2 ) ) )
-    s1[s1>=360.]=s1[s1>=360.]-360.
-    s1[s1<0.]=s1[s1<0.]+360.
+    big = np.argwhere(s1>=360.)
+    if(s1>=360.): s1 = s1-360.
+    if(s1<0.): s1 = s1+360.
     return s1
 
 
@@ -151,8 +152,8 @@ def calc_sigma_theta2_a2b2( a2, b2, spec1d, frequencies ):
     a2bar = np.trapz(a2 * spec1d, frequencies) / np.trapz( spec1d, frequencies )
     b2bar = np.trapz(b2 * spec1d,  frequencies) / np.trapz( spec1d, frequencies )
     s2 = (180./np.pi)*np.sqrt( 0.5 * ( 1.-np.sqrt( a2bar**2 + b2bar**2 ) ) )
-    s2[s2>=360.]=s2[s2>=360.]-360.
-    s2[s2<0.]=s2[s2<0.]+360.
+    if(s2>=360.): s2 = s2-360.
+    if(s2<0.): s2 = s2+360.
     return s2
 
 
