@@ -14,7 +14,7 @@ I commented out the requirement for pygrid after installing it.
 * So I bailed, and copied all of the roguewave estimators code into `roguewave_estimators.py`, and use the kludge `%run -i roguewave_estimators.py` to load those functions.
 
 ####  Function libraries
-`bulk_stats.py` - For model/data comparisons.
+`bulk_stats.py` - For model/data comparisons.  
 `wave_stats.py` - Routines for bulk statistics.  
 
 `roguewave_estimators.py` - MEM and MEM2 estimators copied from roguewave repo as a standalone file.  
@@ -36,8 +36,8 @@ I commented out the requirement for pygrid after installing it.
 `confirm_NDBC_bulk_stats` - For testing wave stats on NDBC buoy data.  
 `example_model_buoy_comparison` - From *Isabelle Houghton*. Demos reading spotter buoys and building a 2dspec. Also, estimating wave components (a1, b1, ...) for model data.  
 `spotter_pickle2wavespec` - Modified from *Jake Davis* - Demonstrates wrangling spotter buoy data into `wavespectra` format...but only works for 1dspec so far. Need to get it working for 2dspec.  
-`test_model_buoy_comparison` - Rambling demo including reading via `xarray` and `wavespectra, based largely on `example_model_buoy_comparison`
-`to_wavespec_estimator` - Derived from `spotter_pickle2wavespec` - Work in progress trying to get spotter 2dspec into `wavespectra` format.
+`test_model_buoy_comparison` - Rambling demo including reading via `xarray` and `wavespectra`, based largely on `example_model_buoy_comparison`
+`to_wavespec_estimator` - Derived from `spotter_pickle2wavespec` - Work in progress trying to get spotter 2dspec into `wavespectra` format.  
 `wave_analysis_nopp_ian_ppt_reggie` - From *Maitane*. Example includes nice maps of best tracks with spotter trajectories and comparison with SWAN output.  
 `wave_plot_funcs.py` - Collection of functions to do model-data comparison plots.  
 ##### Input for wave models
