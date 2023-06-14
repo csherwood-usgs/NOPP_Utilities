@@ -41,15 +41,22 @@ def to_moment( R1,R2, alpha1,alpha2 ):
     :return:
     """
     to_rad = np.pi / 180
-    eps = 1e-16
+    # eps = 1e-16
+    twopi = 2. * np.pi
+    
     angle1 = (270 - alpha1) * to_rad
     angle2 = (540 - 2 * alpha2) * to_rad
     
-    a0 = 1/(2*np.pi) + eps
-    a1 =R1 * np.cos(angle1) / a0
-    b1 =R1 * np.sin(angle1) / a0
-    a2 =R2 * np.cos(angle2) / a0
-    b2 =R2 * np.sin(angle2) / a0
+    # a0 = 1/(2*np.pi) + eps
+    # a1 =R1 * np.cos(angle1) / a0
+    # b1 =R1 * np.sin(angle1) / a0
+    # a2 =R2 * np.cos(angle2) / a0
+    # b2 =R2 * np.sin(angle2) / a0
+    
+    a1 = twopi * R1 * np.cos(angle1)
+    b1 = twopi * R1 * np.sin(angle1)
+    a2 = twopi * R2 * np.cos(angle2)
+    b2 = twopi * R2 * np.sin(angle2)
     
     a1 = np.squeeze( np.nan_to_num( a1 ) )
     b1 = np.squeeze( np.nan_to_num( b1 ) )
@@ -155,6 +162,9 @@ def calc_sigma_theta_a1b1( a1, b1, spec1d, frequencies ):
     b1 = np.squeeze( np.nan_to_num( b1 ) )
     a1bar = np.trapz(a1 * spec1d, frequencies) / np.trapz( spec1d, frequencies )
     b1bar = np.trapz(b1 * spec1d, frequencies) / np.trapz( spec1d, frequencies )
+    # do these need to be scaled?
+    # a1bar = 0.01*a1bar
+    # b1bar = 0.01*b1bar
     coeff = 1. - np.sqrt( a1bar**2 + b1bar**2 )
     if ( coeff )<0. : print('coeff:',coeff)
     s1 = (180./np.pi) * np.sqrt( 2. * ( 1. - np.sqrt( a1bar**2 + b1bar**2 ) ) )
