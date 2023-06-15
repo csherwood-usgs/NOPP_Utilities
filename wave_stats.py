@@ -116,14 +116,14 @@ def calc_Hs_2d( data_field, frequencies, directional_bin_width, faxis=0, daxis=1
     return( 4.*np.sqrt( integrate_frequency_and_direction(data_field, frequencies, directional_bin_width, faxis=faxis, daxis=daxis).squeeze()) )
 
 
-def calc_sigmaf_1d( spec1d, frequencies ):
-    # frequency spread () LeMerle et al., 2021 eqn. 3 based on Blackman & Tukey (1959)
-    return np.trapz( spec1d, frequencies )**2 / np.trap1d( spec1d**2, frequencies )
-
-
-def calc_Qp_1d( spec1d, frequencies ):
-    # frequency peakedness () Le Merle et al., 2021 eqn 4 based on Goda (1976)
-    return 2.*np.trapz( spec1d**2, frequencies ) / (np.trapz( spec1d, frequencies ))**2 
+def calc_sigmaf_Qp_1d( spec1d, f, fmin=0.056, fmax=0.28 ):
+    # frequency spread and spectral peakedness ()
+    # LeMerle et al., 2021 eqns. 3 and 4, based on Blackman & Tukey (1959)
+    s1d = np.nan_to_num( spec1d ) 
+    idx = np.squeeze( np.argwhere( (f >= fmin) & (f <= fmax) ) )
+    sigma_f = (np.trapz( s1d[idx], x=f[idx] )**2 /  np.trapz( s1d[idx]**2, x=f[idx] ) )
+    Qp = (np.trapz( f[idx] * s1d[idx]**2, x=f[idx]) /  np.trapz( s1d[idx], x=f[idx] )**2 )
+    return sigma_f, Qp
 
 
 def calc_theta_mean_a1b1( a1, b1, frequencies ):
@@ -212,4 +212,4 @@ def calc_TM02_1d( spec1d, frequencies, faxis=0 ):
     return np.sqrt( np.traz( spec1d, frequencies, axis=faxis ).squeeze() / np.trapz( frequencies*frequencies*spec1d, frequencies, axis=faxis).squeeze() )
 
 
-#def calc_DSPR_spec2d( spec2d, 
+#def calc_DSPR_2d( spec2d, 
