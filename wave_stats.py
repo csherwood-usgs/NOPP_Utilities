@@ -4,6 +4,13 @@ Codes for converting among various directional wave formats and calculating bulk
 Many of these routines include code and/or guidance from Isabel Houghton at Sofar Ocean.
 
 csherwood@usgs.gov
+
+References:
+
+Le Merle, E., Hauser, D., Peureux, C., Aouf, L., Schippers, P., Dufour, C., & Dalphinet, A. (2021). Directional and Frequency Spread of Surface Ocean Waves From SWIM Measurements. Journal of Geophysical Research: Oceans, 126(7), e2021JC017220. https://doi.org/10.1029/2021JC017220
+
+Magnusson, A. K., Jensen, R., & Swail, V. (2021). Spectral shapes and parameters from three different wave sensors. Ocean Dynamics, 71(9), 893–909. https://doi.org/10.1007/s10236-021-01468-7
+
 """
 import numpy as np
 
@@ -96,14 +103,22 @@ def to_Fourier( Efth, frequencies, direction_radians, directional_bin_width_deg,
 #### 1d statistics from 1d data
 
 def calc_m0_1d( spec1d, frequencies ):
+    # zeroth moment (m^2)
     return np.trapz( spec1d, frequencies )
 
 
 def calc_m1_1d( spec1d, frequencies ):
+    # first moment (m^2 * Hz )
     return np.trapz( spec1d * frequencies, frequencies )
 
 
+def calc_m2_1d( spec1d, frequencies ):
+    # second moment (m^2*Hz^2)
+    return np.trapz( spec1d * frequencies**2, frequencies )
+
+
 def calc_Hs_1d( spec1d, frequencies ):
+    # Actually, Hm0 (m)
     return 4. * np.sqrt( calc_m0_1d( spec1d, frequencies ) )
 
 
@@ -194,6 +209,22 @@ def calc_FSPR_1d( spec1d, frequencies, TM02 ):
     return np.abs( np.trapz( spec1d*np.exp(i*omega*TM02), frequencies ).squeeze() ) / np.trapz(spec1d, frequencies ).squeeze()
 
 
+def calc_sigmaf_1d( spec1d, frequencies ):
+    # Spectral bandwidth based on frequency spread of Blackman & Tukey (1959), as cited in LeMerle et al.(2021), Eqn. 3.
+    # dimensionless
+    return np.trapz(spec1d, frequencies ).squeeze()**2 / np.trapz(spec1d**2, frequencies ).squeeze()
+
+
+def calc_SpecBw_1d( m0, m1, m2 ):
+    # Spectral bandwidth (dimensionless) (Magnusson et al., 2021, eqn. 6)
+    return np.sqrt( (m0*m2)/(m1*m1)-1. )
+
+
+def calc_Qp_1d( spec1d, frequencies, m0 ):
+    # Goda peakedness parameter (Hz) (Magnusson et al., 2021, eqn. 7)
+    return 2./(m0*m0) * np.trapz( frequencies*spec1d*spec1d, frequencies ).squeeze()
+
+
 def calc_TM01_2d( data_field, frequencies, directional_bin_width, faxis=0, daxis=1 ):
     dsum = integrate_in_direction(data_field, directional_bin_width, daxis=daxis).squeeze()
     return ( integrate_in_frequency(dsum, frequencies, faxis=0).squeeze()/integrate_in_frequency(frequencies*dsum, frequencies, faxis=0).squeeze() )
@@ -205,11 +236,13 @@ def calc_TM02_2d( data_field, frequencies, directional_bin_width, faxis=0, daxis
 
 
 def calc_TM01_1d( spec1d, frequencies, faxis=0 ):
+    # Mean wave period based on first moment (s)
     return np.traz( spec1d, frequencies, axis=faxis ).squeeze() / np.trapz( frequencies*spec1d, frequencies, axis=faxis).squeeze()
 
 
-def calc_TM02_1d( spec1d, frequencies, faxis=0 ):
-    return np.sqrt( np.traz( spec1d, frequencies, axis=faxis ).squeeze() / np.trapz( frequencies*frequencies*spec1d, frequencies, axis=faxis).squeeze() )
-
+def calc_TM02_1d( m0, m2 ):
+    # Mean wave period (s) based on second moment (s)
+    return np.sqrt(m0/m2)
+    
 
 #def calc_DSPR_2d( spec2d, 
