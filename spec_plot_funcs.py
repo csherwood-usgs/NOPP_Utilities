@@ -33,14 +33,16 @@ def circle(ax, x0, y0, r, pstring='--', col='gray', alpha=.6, npts=100, zorder=0
     xp, yp = x+x0, y+y0
     ax.plot(xp, yp, pstring, c=col, alpha=alpha, zorder=zorder)
     
-def arc(ax, x0, y0, r, az0, az1, pstring='-', col='black', npts=20, alpha=.6, zorder=0):
+def arc(ax, x0, y0, r, az0, az1, S, pstring='-', col='black', npts=20, alpha=.4, zorder=0,
+        vmin=0., vmax=30., cmap=cm.Spectral_r ):
     """
     Draw an arc with radius r from az0 to az1 with npts
     """
+    norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
     az = np.linspace( az0, az1, npts )
     x, y = xycoord( r, az )
     xp, yp = x+x0, y+y0
-    ax.plot(xp, yp, pstring, c=col, alpha=alpha, zorder=zorder)
+    ax.plot(xp, yp, pstring, c=col, alpha=alpha, zorder=zorder )
     
 def pline(ax, x0, y0, x, y, pstring='-', col='black', alpha=.6, zorder=1):
     """
@@ -96,6 +98,33 @@ def plt_rdata(ax, lon, lat, Hs, Tp, sigf, Dp, Dsprd, sf=2., ps = 85, fc=1./33., 
     arc(ax, x0, y0, logr( 1./Tp, fc=fc, sfr=sfr) , Dp-Dsprd/2., Dp+Dsprd/2., zorder=1)
     pline(ax, x0, y0, rx, ry, zorder=1 )
     ax.scatter(wx, wy, ps, Hs, vmin=0., vmax=10., zorder=3, edgecolor=ec)
+    
+def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., ec='black', cmap='Reds'):
+    # f = frequency [Hz]
+    # S(f) = spectral density [m^2 (deg*Hz)^-1 ]
+    # dirm(f) = mean direction (deg)
+    # sprd(f) = directional spread (deg)
+    
+    # plot using radial coords
+    # sf is scale factor for sigma
+    # ps is point size for dot
+    # fc is lowest frequency that can be plotted (center of circle)
+    # sfr is general scaling factor
+    # ec is edgecolor for dot
+    vmin=0.
+    vmax=30.
+    norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
+    
+    nf = np.shape(f)[0]
+    sx = np.zeros_like(f)
+    sy = np.zeros_like(f)
+    for i in range(nf):
+        sx[i], sy[i] = xycoord( logr( f[i] ), dm[i] )
+        arc(ax, x0, y0, logr( f[i], fc=fc, sfr=sfr) , dm[i]-sprd[i]/2., dm[i]+sprd[i]/2., S,
+            zorder=1, alpha = 0.6, vmin=vmin, vmax=vmax, cmap=cmap )
+        
+    ax.scatter( sx, sy, c = S, s = ps, vmin=vmin, vmax=vmax, cmap=cmap, zorder=3, alpha = 0.8 )
+
     
 def logr( f, fc =  1./33., sfr = 1. ):
     # calculations to convert frequency to plot radius

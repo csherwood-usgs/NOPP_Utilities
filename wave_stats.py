@@ -211,7 +211,7 @@ def calc_FSPR_1d( spec1d, frequencies, TM02 ):
 
 def calc_sigmaf_1d( spec1d, frequencies ):
     # Spectral bandwidth based on frequency spread of Blackman & Tukey (1959), as cited in LeMerle et al.(2021), Eqn. 3.
-    # dimensionless
+    # (Hz)
     return np.trapz(spec1d, frequencies ).squeeze()**2 / np.trapz(spec1d**2, frequencies ).squeeze()
 
 
