@@ -33,8 +33,20 @@ def circle(ax, x0, y0, r, pstring='--', col='gray', alpha=.6, npts=100, zorder=0
     xp, yp = x+x0, y+y0
     ax.plot(xp, yp, pstring, c=col, alpha=alpha, zorder=zorder)
     
-def arc(ax, x0, y0, r, az0, az1, S, pstring='-', col='black', npts=20, alpha=.4, zorder=0,
+def arc(ax, x0, y0, r, az0, az1, pstring='-', col='black', npts=20, alpha=.4, zorder=0,
         vmin=0., vmax=30., cmap=cm.Spectral_r ):
+    """
+    Draw an arc with radius r from az0 to az1 with npts
+    """
+    norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
+    az = np.linspace( az0, az1, npts )
+    x, y = xycoord( r, az )
+    xp, yp = x+x0, y+y0
+    ax.plot(xp, yp, pstring, c=col, alpha=alpha, zorder=zorder )
+
+    
+def arcs(ax, x0, y0, r, az0, az1, pstring='-', col='black', npts=20, alpha=.4, zorder=0,
+        vmin=0., vmax=30., cmap=cm.Spectral_r, rscale=True ):
     """
     Draw an arc with radius r from az0 to az1 with npts
     """
@@ -99,7 +111,7 @@ def plt_rdata(ax, lon, lat, Hs, Tp, sigf, Dp, Dsprd, sf=2., ps = 85, fc=1./33., 
     pline(ax, x0, y0, rx, ry, zorder=1 )
     ax.scatter(wx, wy, ps, Hs, vmin=0., vmax=10., zorder=3, edgecolor=ec)
     
-def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., ec='black', cmap='Reds'):
+def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., ec='black', cmap='Reds', rscale=True):
     # f = frequency [Hz]
     # S(f) = spectral density [m^2 (deg*Hz)^-1 ]
     # dirm(f) = mean direction (deg)
@@ -111,6 +123,15 @@ def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., 
     # fc is lowest frequency that can be plotted (center of circle)
     # sfr is general scaling factor
     # ec is edgecolor for dot
+    
+    
+    # sort the data so highest values will plot on top
+    isort = np.argsort(S)
+    S = S[isort]
+    f = f[isort]
+    dm = dm[isort]
+    sprd = sprd[isort]
+    
     vmin=0.
     vmax=30.
     norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
@@ -120,10 +141,15 @@ def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., 
     sy = np.zeros_like(f)
     for i in range(nf):
         sx[i], sy[i] = xycoord( logr( f[i] ), dm[i] )
-        arc(ax, x0, y0, logr( f[i], fc=fc, sfr=sfr) , dm[i]-sprd[i]/2., dm[i]+sprd[i]/2., S,
-            zorder=1, alpha = 0.6, vmin=vmin, vmax=vmax, cmap=cmap )
+        r = logr( f[i], fc=fc, sfr=sfr) 
+        if rscale:
+            sprd[i] = sprd[i]/r
+        azlo = (dm[i]-sprd[i]/2.)
+        azhi = (dm[i]+sprd[i]/2.)
+        arc(ax, x0, y0, r , azlo, azhi, col=cmap(norm(S[i])),
+            zorder=1, alpha = 0.7, vmin=vmin, vmax=vmax, cmap=cmap )
         
-    ax.scatter( sx, sy, c = S, s = ps, vmin=vmin, vmax=vmax, cmap=cmap, zorder=3, alpha = 0.8 )
+    ax.scatter( sx, sy, c = S, s = ps, vmin=vmin, vmax=vmax, cmap=cmap, zorder=3, alpha = 0.9 )
 
     
 def logr( f, fc =  1./33., sfr = 1. ):
@@ -132,3 +158,27 @@ def logr( f, fc =  1./33., sfr = 1. ):
     # sfr is general scaling factor    
     r = sfr * (np.log10( f ) - np.log10( fc ))
     return r
+
+def setup_radial_plot( cmap=cm.Spectral_r ):
+    radii_f=[0.05, 0.1, 0.2, 0.3, 0.4]
+
+    # placeholder in case we need to repostion the plot
+    x0 = 0.
+    y0 = 0.
+
+    fig = plt.figure( )
+    ax = fig.add_subplot()
+    ax.set_aspect('equal', adjustable='box')
+
+    # frequency rings
+    for fr in np.array( radii_f ):
+        r = logr( fr )
+        circle(ax, x0, y0, r, zorder=0)
+
+    # label rings
+    for i in np.array(radii_f):
+        ptext(ax, x0, y0, logr(i), 45, "{}".format(i) )
+    ax.axis('off')
+
+    cmap = cmap
+    return fig, ax

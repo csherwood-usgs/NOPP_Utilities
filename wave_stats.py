@@ -97,7 +97,7 @@ def to_Fourier( Efth, frequencies, direction_radians, directional_bin_width_deg,
     b2 = integrate_in_direction(Efth * np.sin(2 * direction_radians),
                                 directional_bin_width=directional_bin_width_deg, daxis=daxis) / Ef
     
-    return Ef, a1, a2, b1, b2
+    return np.squeeze(Ef), np.squeeze(a1), np.squeeze(a2), np.squeeze(b1), np.squeeze(b2)
 
 
 #### 1d statistics from 1d data
@@ -200,6 +200,29 @@ def calc_sigma_theta2_a2b2( a2, b2, spec1d, frequencies ):
     if(s2>=360.): s2 = s2-360.
     if(s2<0.): s2 = s2+360.
     return s2
+
+
+def calc_spread1_a1b1( a1, b1 ):
+    # Directional spreading for each frequency (degrees)
+    # Eqn. 5 in Merle et al., 2021
+    #    
+    # Input: a1(f), b1(f)
+    # Returns: mean direction(f)
+    return (180./np.pi)* np.sqrt( 2. * (1. - np.sqrt( a1**2 + b1**2 ) ) )
+
+
+def calc_spread2_a1b1( a2, b2 ):
+    # By analogy to calc_spread1_a1b1
+    return (180./np.pi)* np.sqrt( 2. * (0.5 - np.sqrt( a2**2 + b2**2 ) ) )
+
+
+def calc_dirmf_a1b1( a1, b1 ):
+    # Mean direction for each frequency (degrees)
+    # Eqn. 6 in Merle et al., 2021
+    # 
+    # Input: a1(f), b1(f)
+    # Returns: mean direction(f)
+    return(180./np.pi * np.arctan2( a1, b1 ) )
 
 
 def calc_FSPR_1d( spec1d, frequencies, TM02 ):
