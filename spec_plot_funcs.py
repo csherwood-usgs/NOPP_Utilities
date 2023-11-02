@@ -111,7 +111,7 @@ def plt_rdata(ax, lon, lat, Hs, Tp, sigf, Dp, Dsprd, sf=2., ps = 85, fc=1./33., 
     pline(ax, x0, y0, rx, ry, zorder=1 )
     ax.scatter(wx, wy, ps, Hs, vmin=0., vmax=10., zorder=3, edgecolor=ec)
     
-def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., ec='black', cmap='Reds', rscale=True):
+def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., ec='black', vmin=-2.2, vmax=1.5, cmap='Reds', rscale=False):
     # f = frequency [Hz]
     # S(f) = spectral density [m^2 (deg*Hz)^-1 ]
     # dirm(f) = mean direction (deg)
@@ -123,6 +123,9 @@ def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., 
     # fc is lowest frequency that can be plotted (center of circle)
     # sfr is general scaling factor
     # ec is edgecolor for dot
+    # cmap is colormap
+    # rscale=True scales the spread according to the radius
+    # lscale=True scales S with log10(S)
     
     
     # sort the data so highest values will plot on top
@@ -131,9 +134,7 @@ def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., 
     f = f[isort]
     dm = dm[isort]
     sprd = sprd[isort]
-    
-    vmin=0.
-    vmax=30.
+
     norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
     
     nf = np.shape(f)[0]
@@ -148,8 +149,8 @@ def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., 
         azhi = (dm[i]+sprd[i]/2.)
         arc(ax, x0, y0, r , azlo, azhi, col=cmap(norm(S[i])),
             zorder=1, alpha = 0.7, vmin=vmin, vmax=vmax, cmap=cmap )
-        
-    ax.scatter( sx, sy, c = S, s = ps, vmin=vmin, vmax=vmax, cmap=cmap, zorder=3, alpha = 0.9 )
+
+        ax.scatter( sx, sy, c = S, s = ps, vmin=vmin, vmax=vmax, edgecolors=ec, cmap=cmap, zorder=3, alpha = 0.8 )
 
     
 def logr( f, fc =  1./33., sfr = 1. ):
