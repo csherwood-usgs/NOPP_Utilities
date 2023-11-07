@@ -80,8 +80,8 @@ def to_Fourier( Efth, frequencies, direction_radians, directional_bin_width_deg,
     """
     eps = 1e-16
     Ef = integrate_in_direction(Efth, directional_bin_width_deg, daxis=daxis) + eps
-    print('shape of Ef: ',np.shape(Efth))
-    print('shape of Ef: ',np.shape(Ef))
+    # print('shape of Efth: ',np.shape(Efth))
+    # print('shape of Ef: ',np.shape(Ef))
 
     # each directional coefficient (a1, b1..) is a Fourier coefficient of the 2D WW3 spectrum,
     # normalized by the 1D (directionally-integrated) energy density spectrum
