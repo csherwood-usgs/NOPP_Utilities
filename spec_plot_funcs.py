@@ -111,12 +111,12 @@ def plt_rdata(ax, lon, lat, Hs, Tp, sigf, Dp, Dsprd, sf=2., ps = 85, fc=1./33., 
     pline(ax, x0, y0, rx, ry, zorder=1 )
     ax.scatter(wx, wy, ps, Hs, vmin=0., vmax=10., zorder=3, edgecolor=ec)
     
-def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., ec='black', vmin=-2.2, vmax=1.5, cmap='Reds', rscale=False):
+def plt_spread(ax, x0, y0, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., ec='black', vmin=-2.2, vmax=1.5, cmap='Reds', rscale=False, cbar=True):
+    # Radial plot for a single observation, with or without colorbar.
     # f = frequency [Hz]
     # S(f) = spectral density [m^2 (deg*Hz)^-1 ]
     # dirm(f) = mean direction (deg)
-    # sprd(f) = directional spread (deg)
-    
+    # sprd(f) = directional spread (deg)  
     # plot using radial coords
     # sf is scale factor for sigma
     # ps is point size for dot
@@ -125,9 +125,18 @@ def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., 
     # ec is edgecolor for dot
     # cmap is colormap
     # rscale=True scales the spread according to the radius
-    # lscale=True scales S with log10(S)
     
+    # for log scaling, suggest
+    # vmin = -2.2
+    # vmax = 1.5
+
+    # for linear scaling, suggest
+    # vmin=0.
+    # vmax=30.
     
+     # location of radial rings
+    radii_f=[0.05, 0.1, 0.2, 0.3, 0.4]
+
     # sort the data so highest values will plot on top
     isort = np.argsort(S)
     S = S[isort]
@@ -136,7 +145,19 @@ def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., 
     sprd = sprd[isort]
 
     norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
-    
+
+    fig, ax = plt.subplots(1, 1, layout='constrained')
+    #ax = fig.add_subplot()
+    ax.set_aspect('equal', adjustable='box')
+    # frequency rings
+    for fr in np.array( radii_f ):
+        r = logr( fr )
+        circle(ax, x0, y0, r, zorder=0)
+    # label rings
+    for i in np.array(radii_f):
+        ptext(ax, x0, y0, logr(i), 45, "{}".format(i) )
+    ax.axis('off')
+
     nf = np.shape(f)[0]
     sx = np.zeros_like(f)
     sy = np.zeros_like(f)
@@ -151,7 +172,189 @@ def plt_spread(ax, lon, lat, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., 
             zorder=1, alpha = 0.7, vmin=vmin, vmax=vmax, cmap=cmap )
 
         ax.scatter( sx, sy, c = S, s = ps, vmin=vmin, vmax=vmax, edgecolors=ec, cmap=cmap, zorder=3, alpha = 0.8 )
+    if(cbar):
+        sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+        sm.set_array([])
+        ax.figure.colorbar(sm, ax = ax, shrink=.7, label = r'log$_{10}$[ Energy Density (m$^2$/Hz) ]')
+        
+def plt_2spread(ax, x0, y0, fobs, Sobs, dmobs, sprdobs, 
+                            fmod, Smod, dmmod, sprdmod,
+                sf=2., ps = 25, fc=1./33., sfr=1., ec='black', vmin=-2.2, vmax=1.5, cmap='Reds', rscale=False, cbar=True, titles=True):
+    # Radial plot for a pair of model-data observations, with or without colorbar, with or without titles.
+    # f = frequency [Hz]
+    # S(f) = spectral density [m^2 (deg*Hz)^-1 ]
+    # dm(f) = mean direction (deg)
+    # sprd(f) = directional spread (deg)  
+    # plot using radial coords
+    # sf is scale factor for sigma
+    # ps is point size for dot
+    # fc is lowest frequency that can be plotted (center of circle)
+    # sfr is general scaling factor
+    # ec is edgecolor for dot
+    # cmap is colormap
+    # rscale=True scales the spread according to the radius
+    
+    # for log scaling, suggest
+    # vmin = -2.2
+    # vmax = 1.5
 
+    # for linear scaling, suggest
+    # vmin=0.
+    # vmax=30.
+    
+    title = ['Drifter','SWAN']
+    
+     # location of radial rings
+    radii_f=[0.05, 0.1, 0.2, 0.3, 0.4]
+
+    norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
+
+    fig, axs = plt.subplots(1, 2, layout='constrained')
+    #ax = fig.add_subplot()
+    for k, ax in enumerate(axs):
+        ax.set_aspect('equal', adjustable='box')
+        # frequency rings
+        for fr in np.array( radii_f ):
+            r = logr( fr )
+            circle(ax, x0, y0, r, zorder=0)
+        # label rings
+        for i in np.array(radii_f):
+            ptext(ax, x0, y0, logr(i), 45, "{}".format(i) )
+        ax.axis('off')
+        
+        if k==0:
+            # observations
+            f = fobs
+            S=Sobs
+            dm=dmobs
+            sprd=sprdobs
+        else:
+            # model
+            f = fmod
+            S=Smod
+            dm=dmmod
+            sprd=sprdmod
+            
+        # sort the data so highest values will plot on top
+        isort = np.argsort(S)
+        S = S[isort]
+        f = f[isort]
+        dm = dm[isort]
+        sprd = sprd[isort]
+
+        nf = np.shape(f)[0]
+        sx = np.zeros_like(f)
+        sy = np.zeros_like(f)
+        for i in range(nf):
+            sx[i], sy[i] = xycoord( logr( f[i] ), dm[i] )
+            r = logr( f[i], fc=fc, sfr=sfr) 
+            if rscale:
+                sprd[i] = sprd[i]/r
+            azlo = (dm[i]-sprd[i]/2.)
+            azhi = (dm[i]+sprd[i]/2.)
+            arc(ax, x0, y0, r , azlo, azhi, col=cmap(norm(S[i])),
+                zorder=1, alpha = 0.7, vmin=vmin, vmax=vmax, cmap=cmap )
+
+            ax.scatter( sx, sy, c = S, s = ps, vmin=vmin, vmax=vmax, edgecolors=ec, cmap=cmap, zorder=3, alpha = 0.8 )
+
+            ax.set_title( title[k] )
+    if(cbar):
+        sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+        sm.set_array([])
+        ax.figure.colorbar(sm, ax = axs[1], shrink=.4, label = r'log$_{10}$[ Energy Density (m$^2$/Hz) ]')
+    
+    
+def plt_overlay_spread(ax, x0, y0, fobs, Sobs, dmobs, sprdobs, 
+                            fmod, Smod, dmmod, sprdmod,
+                sf=2., ps = 25, fc=1./33., sfr=1., ec='black', vmin=-2.2, vmax=1.5, cmap='Reds', rscale=False, cbar=True, titles=True):
+    # Radial plot for a pair of model-data observations, with or without colorbar, with or without titles.
+    # f = frequency [Hz]
+    # S(f) = spectral density [m^2 (deg*Hz)^-1 ]
+    # dm(f) = mean direction (deg)
+    # sprd(f) = directional spread (deg)  
+    # plot using radial coords
+    # sf is scale factor for sigma
+    # ps is point size for dot
+    # fc is lowest frequency that can be plotted (center of circle)
+    # sfr is general scaling factor
+    # ec is edgecolor for dot
+    # cmap is colormap
+    # rscale=True scales the spread according to the radius
+    
+    # for log scaling, suggest
+    # vmin = -2.2
+    # vmax = 1.5
+
+    # for linear scaling, suggest
+    # vmin=0.
+    # vmax=30.
+    
+    title = ['Drifter','SWAN']
+    
+     # location of radial rings
+    radii_f=[0.05, 0.1, 0.2, 0.3, 0.4]
+
+    norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
+
+    fig, ax = plt.subplots(1, 1, layout='constrained')
+
+    ax.set_aspect('equal', adjustable='box')
+    # frequency rings
+    for fr in np.array( radii_f ):
+        r = logr( fr )
+        circle(ax, x0, y0, r, zorder=0)
+    # label rings
+    for i in np.array(radii_f):
+        ptext(ax, x0, y0, logr(i), 45, "{}".format(i) )
+    ax.axis('off')
+    for k in range(2):
+        
+        if k==0:
+            # observations
+            f = fobs
+            S=Sobs
+            dm=dmobs
+            sprd=sprdobs
+            cmap = cm.Reds
+        else:
+            # model
+            f = fmod
+            S=Smod
+            dm=dmmod
+            sprd=sprdmod
+            cmap = cm.Greys
+            
+        # sort the data so highest values will plot on top
+        isort = np.argsort(S)
+        S = S[isort]
+        f = f[isort]
+        dm = dm[isort]
+        sprd = sprd[isort]
+
+        nf = np.shape(f)[0]
+        sx = np.zeros_like(f)
+        sy = np.zeros_like(f)
+        for i in range(nf):
+            sx[i], sy[i] = xycoord( logr( f[i] ), dm[i] )
+            r = logr( f[i], fc=fc, sfr=sfr) 
+            if rscale:
+                sprd[i] = sprd[i]/r
+            azlo = (dm[i]-sprd[i]/2.)
+            azhi = (dm[i]+sprd[i]/2.)
+            arc(ax, x0, y0, r , azlo, azhi, col=cmap(norm(S[i])),
+                zorder=1, alpha = 0.7, vmin=vmin, vmax=vmax, cmap=cmap )
+
+            ax.scatter( sx, sy, c = S, s = ps, vmin=vmin, vmax=vmax, edgecolors=ec, cmap=cmap, zorder=3, alpha = 0.8 )
+
+            #ax.set_title( title[k] )
+        if(cbar):
+            sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+            sm.set_array([])
+            if k==0:
+                ax.figure.colorbar(sm, ax = ax, shrink=.4, pad = .1, label = r'Drifter log$_{10}$[ Energy Density (m$^2$/Hz) ]')
+            if k==1:
+                ax.figure.colorbar(sm, ax = ax, shrink=.4, pad = .2, label = r'SWAN log$_{10}$[ Energy Density (m$^2$/Hz) ]')
+    
     
 def logr( f, fc =  1./33., sfr = 1. ):
     # calculations to convert frequency to plot radius
