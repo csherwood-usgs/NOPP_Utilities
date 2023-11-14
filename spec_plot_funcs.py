@@ -179,7 +179,7 @@ def plt_spread(ax, x0, y0, f, S, dm, sprd, sf=2., ps = 25, fc=1./33., sfr=1., ec
         
 def plt_2spread(ax, x0, y0, fobs, Sobs, dmobs, sprdobs, 
                             fmod, Smod, dmmod, sprdmod,
-                sf=2., ps = 25, fc=1./33., sfr=1., ec='black', vmin=-2.2, vmax=1.5, cmap='Reds', rscale=False, cbar=True, titles=True):
+                sf=2., ps = 25, fc=1./33., sfr=1., ec='black', vmin=-2.2, vmax=1.5, cmap='Reds', rscale=False, cbar=True, titles=['Drifter','SWAN']):
     # Radial plot for a pair of model-data observations, with or without colorbar, with or without titles.
     # f = frequency [Hz]
     # S(f) = spectral density [m^2 (deg*Hz)^-1 ]
@@ -201,8 +201,6 @@ def plt_2spread(ax, x0, y0, fobs, Sobs, dmobs, sprdobs,
     # for linear scaling, suggest
     # vmin=0.
     # vmax=30.
-    
-    title = ['Drifter','SWAN']
     
      # location of radial rings
     radii_f=[0.05, 0.1, 0.2, 0.3, 0.4]
@@ -257,7 +255,7 @@ def plt_2spread(ax, x0, y0, fobs, Sobs, dmobs, sprdobs,
 
             ax.scatter( sx, sy, c = S, s = ps, vmin=vmin, vmax=vmax, edgecolors=ec, cmap=cmap, zorder=3, alpha = 0.8 )
 
-            ax.set_title( title[k] )
+            ax.set_title( titles[k] )
     if(cbar):
         sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
         sm.set_array([])
@@ -266,7 +264,7 @@ def plt_2spread(ax, x0, y0, fobs, Sobs, dmobs, sprdobs,
     
 def plt_overlay_spread(ax, x0, y0, fobs, Sobs, dmobs, sprdobs, 
                             fmod, Smod, dmmod, sprdmod,
-                sf=2., ps = 25, fc=1./33., sfr=1., ec='black', vmin=-2.2, vmax=1.5, cmap='Reds', rscale=False, cbar=True, titles=True):
+                sf=2., ps = 25, fc=1./33., sfr=1., ec='black', vmin=-2.2, vmax=1.5, cmap='Reds', rscale=False, cbar=True, title=['Drifter v. SWAN']):
     # Radial plot for a pair of model-data observations, with or without colorbar, with or without titles.
     # f = frequency [Hz]
     # S(f) = spectral density [m^2 (deg*Hz)^-1 ]
@@ -288,8 +286,6 @@ def plt_overlay_spread(ax, x0, y0, fobs, Sobs, dmobs, sprdobs,
     # for linear scaling, suggest
     # vmin=0.
     # vmax=30.
-    
-    title = ['Drifter','SWAN']
     
      # location of radial rings
     radii_f=[0.05, 0.1, 0.2, 0.3, 0.4]
@@ -343,17 +339,18 @@ def plt_overlay_spread(ax, x0, y0, fobs, Sobs, dmobs, sprdobs,
             azhi = (dm[i]+sprd[i]/2.)
             arc(ax, x0, y0, r , azlo, azhi, col=cmap(norm(S[i])),
                 zorder=1, alpha = 0.7, vmin=vmin, vmax=vmax, cmap=cmap )
-
-            ax.scatter( sx, sy, c = S, s = ps, vmin=vmin, vmax=vmax, edgecolors=ec, cmap=cmap, zorder=3, alpha = 0.8 )
-
-            #ax.set_title( title[k] )
+            ax.scatter( sx, sy, c = S, s = ps, vmin=vmin, vmax=vmax, edgecolors=ec, 
+                       cmap=cmap, zorder=3, alpha = 0.8 )
+            ax.set_title( title )
         if(cbar):
             sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
             sm.set_array([])
             if k==0:
-                ax.figure.colorbar(sm, ax = ax, shrink=.4, pad = .1, label = r'Drifter log$_{10}$[ Energy Density (m$^2$/Hz) ]')
+                ax.figure.colorbar(sm, ax = ax, shrink=.4, pad = .1,
+                                   label = r'Drifter log$_{10}$[ Energy Density (m$^2$/Hz) ]')
             if k==1:
-                ax.figure.colorbar(sm, ax = ax, shrink=.4, pad = .2, label = r'SWAN log$_{10}$[ Energy Density (m$^2$/Hz) ]')
+                ax.figure.colorbar(sm, ax = ax, shrink=.4, pad = .2,
+                                   label = r'SWAN log$_{10}$[ Energy Density (m$^2$/Hz) ]')
     
     
 def logr( f, fc =  1./33., sfr = 1. ):
