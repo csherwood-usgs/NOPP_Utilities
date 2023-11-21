@@ -36,12 +36,3 @@ def dist_bearing(lon1, lat1, lon2, lat2):
     dist = haversine(lon1, lat1, lon2, lat2)
     brng = get_bearing(lon1, lat1, lon2, lat2)
     return dist, brng
-
-if __name__ == '__main__':
-    lat1 = 47.1
-    lon1 = -62.
-    lat2 = 47.2
-    lon2 = 62.1
-
-    d, az = dist_bearing( lon1, lat1, lon2, lat2)
-    print(d, az)
