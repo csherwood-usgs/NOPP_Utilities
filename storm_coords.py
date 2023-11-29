@@ -32,6 +32,27 @@ def get_bearing(lon1, lat1, lon2, lat2):
 
     return brng_deg
 
+def get_point_at_distance(lat1, lon1, d, bearing, R=6371):
+    """
+    lat: initial latitude, in degrees
+    lon: initial longitude, in degrees
+    d: target distance from initial (km)
+    bearing: (true) heading in degrees
+    R: optional radius of sphere, defaults to mean radius of earth
+
+    Returns new lat/lon coordinate {d}km from initial, in degrees
+    https://stackoverflow.com/questions/7222382/get-lat-long-given-current-point-distance-and-bearing
+    """
+    lat1 = np.radians(lat1)
+    lon1 = np.radians(lon1)
+    a = np.radians(bearing)
+    lat2 = np.arcsin(np.sin(lat1) * np.cos(d/R) + np.cos(lat1) * np.sin(d/R) * np.cos(a))
+    lon2 = lon1 + np.arctan2(
+        np.sin(a) * np.sin(d/R) * np.cos(lat1),
+        np.cos(d/R) - np.sin(lat1) * np.sin(lat2)
+    )
+    return (np.degrees(lat2), np.degrees(lon2),)
+
 def dist_bearing(lon1, lat1, lon2, lat2):
     dist = haversine(lon1, lat1, lon2, lat2)
     brng = get_bearing(lon1, lat1, lon2, lat2)
