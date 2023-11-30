@@ -53,6 +53,26 @@ def get_point_at_distance(lat1, lon1, d, bearing, R=6371):
     )
     return (np.degrees(lat2), np.degrees(lon2),)
 
+def pcoord(x, y):
+    """
+    Convert x, y to polar coordinates r, az (geographic convention)
+    r,az = pcoord(x, y)
+    """
+    r = np.sqrt(x**2 + y**2)
+    az = np.degrees(np.arctan2(x, y))
+    # az[where(az<0.)[0]] += 360.
+    az = (az+360.)%360.
+    return r, az
+
+def xycoord(r, az):
+    """
+    Convert r, az [degrees, geographic convention] to rectangular coordinates
+    x,y = xycoord(r, az)
+    """
+    x = r * np.sin(np.radians(az))
+    y = r * np.cos(np.radians(az))
+    return x, y
+
 def dist_bearing(lon1, lat1, lon2, lat2):
     dist = haversine(lon1, lat1, lon2, lat2)
     brng = get_bearing(lon1, lat1, lon2, lat2)
