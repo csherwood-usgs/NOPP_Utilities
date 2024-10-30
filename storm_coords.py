@@ -1,25 +1,24 @@
 import numpy as np
 
 
-def haversine(lon1, lat1, lon2, lat2):
+def haversine(lon1, lat1, lon2, lat2, radius=6371.):
     """
     Calculate the great circle distance between two points
-    on the earth (specified in decimal degrees)
+    on the earth. Input in decimal degrees.
     
     All args must be of equal length. 
 
     https://stackoverflow.com/questions/29545704/fast-haversine-approximation-python-pandas   
-    Changed radius of earth to 6371. CRS
+    Default radius of earth is  6371 km
     """
     lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
     
     dlon = lon2 - lon1
     dlat = lat2 - lat1
     
-    a = np.sin(dlat/2.0)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2.0)**2
-    
+    a = np.sin(dlat/2.0)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2.0)**2  
     c = 2 * np.arcsin(np.sqrt(a))
-    km = 6371. * c
+    km = radius * c
     return km
 
 def get_bearing(lon1, lat1, lon2, lat2):
