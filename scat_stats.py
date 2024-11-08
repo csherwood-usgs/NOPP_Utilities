@@ -27,6 +27,12 @@ def calc_bias( S, O ):
     """
     ok = np.isfinite(S+O) # eliminate if NaNs in either dataset
     return np.mean( S[ok] ) - np.mean( O[ok] )
+
+def calc_nbias( S, O ):
+    """Normalized bias
+    Dimensionless
+
+    """
            
 def calc_RMSE( S, O ):
     """Equation MBCM  2
@@ -43,12 +49,20 @@ def calc_NRMSE( S, O ):
 
 # Other stats
 def calc_rho( S, O ):
-    """Pearsons R
-    Ranges from -1 (no correlation) to 1 (perfect correlation)
+    """Correlaton coefficient AKA Pearsons r
+    Ranges from -1 (perfect negative correlation) to 0 (no correlation) to +1 (perfect correlation)
     Dimensionless.
     """
     ok = np.isfinite(S+O) # eliminate if NaNs in either dataset
-    return  np.corrcoef( S[ok], O[ok] )[0,0]
+    # longhand to check
+    Sbar = np.mean(S[ok])
+    Obar = np.mean(O[ok])
+    Sd = (S[ok]-Sbar)
+    Od = (O[ok]-Obar)
+    rho = ( np.sum( Sd*Od )) / np.sqrt( np.sum( Sd**2 ) * np.sum( Od**2 ) )
+    rho2 =  np.corrcoef( S[ok], O[ok] )[0,0]
+    print(rho, rho2)
+    return rho
     
 def scat_stats_array( S, O ):
     S = S.flatten()
@@ -65,8 +79,8 @@ def scat_stats_array( S, O ):
 
 def scat_stats_string( S, O, sep_lines=True ):
     a = scat_stats_array( S, O )
-    s = 'N: {0:.0f}\nNnan: {1:.0f}\nRMSE: {2:.3f}\n\rho: {3:.3f}\nBias: {4:.3f}\nNRMSE: {5:.3f}\nHH: {6:.3f}'.\
+    s = 'N: {0:.0f}\nNnan: {1:.0f}\nRMSE: {2:.3f}\nrho: {3:.3f}\nBias: {4:.3f}\nNRMSE: {5:.3f}\nHH: {6:.3f}'.\
     format( a[0],a[1],a[2],a[3],a[4], a[5], a[6] ) 
-    return s
+    return a, s
     
     
