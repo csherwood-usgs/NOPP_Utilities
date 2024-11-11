@@ -54,15 +54,33 @@ def calc_rho( S, O ):
     Dimensionless.
     """
     ok = np.isfinite(S+O) # eliminate if NaNs in either dataset
-    # longhand to check
-    Sbar = np.mean(S[ok])
-    Obar = np.mean(O[ok])
-    Sd = (S[ok]-Sbar)
-    Od = (O[ok]-Obar)
-    rho = ( np.sum( Sd*Od )) / np.sqrt( np.sum( Sd**2 ) * np.sum( Od**2 ) )
-    rho2 =  np.corrcoef( S[ok], O[ok] )[0,0]
-    print(rho, rho2)
+    # longhand to check...answers match
+    # Sbar = np.mean(S[ok])
+    # Obar = np.mean(O[ok])
+    # Sd = (S[ok]-Sbar)
+    # Od = (O[ok]-Obar)
+    # rho2 = ( np.sum( Sd*Od )) / np.sqrt( np.sum( Sd**2 ) * np.sum( Od**2 ) )
+    rho =  np.corrcoef( S[ok], O[ok] )[0,1]
     return rho
+
+def calc_lag_corr( S, O ):
+    # Both arrays should be equally spaced with no missing data
+    # Remove means
+    Sm = S - np.mean( S )
+    Om = O - np.mean( O )
+
+    # Compute cross-correlation using numpy.correlate
+    corr = np.correlate( S, O, mode='full')
+
+    # Generate array of lags
+    lags = np.arange(-len(S) + 1, len(O))
+
+    # Find the lag with the maximum correlation
+    max_corr_index = np.argmax(np.abs(corr))  # For maximum absolute correlation
+    max_lag = lags[max_corr_index]
+    max_correlation = corr[max_corr_index]
+
+
     
 def scat_stats_array( S, O ):
     S = S.flatten()
